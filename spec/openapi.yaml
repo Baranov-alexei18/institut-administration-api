@@ -1,0 +1,180 @@
+openapi: 3.0.0
+paths:
+  /api/v1:
+    get:
+      operationId: AppController_getHello
+      parameters: []
+      responses:
+        "200":
+          description: ""
+      tags:
+        - App
+  /api/v1/users:
+    get:
+      operationId: UsersController_getUsers
+      parameters: []
+      responses:
+        "200":
+          description: ""
+      security:
+        - bearer: []
+      tags: &a1
+        - Users
+    post:
+      operationId: UsersController_create
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateUserDto"
+      responses:
+        "201":
+          description: ""
+      security:
+        - bearer: []
+      tags: *a1
+  /api/v1/users/{id}:
+    get:
+      operationId: UsersController_getById
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: number
+      responses:
+        "200":
+          description: ""
+      security:
+        - bearer: []
+      tags: *a1
+    delete:
+      operationId: UsersController_delete
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: number
+      responses:
+        "200":
+          description: ""
+      security:
+        - bearer: []
+      tags: *a1
+  /api/v1/auth/register:
+    post:
+      operationId: AuthController_register
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateUserDto"
+      responses:
+        "201":
+          description: ""
+      tags: &a2
+        - Auth
+  /api/v1/auth/login:
+    post:
+      operationId: AuthController_login
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateUserDto"
+      responses:
+        "201":
+          description: ""
+      tags: *a2
+  /api/v1/auth/refresh:
+    post:
+      operationId: AuthController_refresh
+      parameters: []
+      responses:
+        "201":
+          description: ""
+      tags: *a2
+  /api/v1/students:
+    get:
+      operationId: StudentsController_getStudents
+      parameters:
+        - name: faculty
+          required: false
+          in: query
+          schema:
+            example: Engineering
+            type: string
+        - name: courses
+          required: false
+          in: query
+          schema:
+            example:
+              - 1
+              - 2
+            type: array
+            items:
+              type: number
+        - name: gender
+          required: false
+          in: query
+          schema:
+            example: male
+            type: string
+            enum:
+              - male
+              - female
+        - name: minAge
+          required: false
+          in: query
+          schema:
+            example: 18
+            type: number
+        - name: maxAge
+          required: false
+          in: query
+          schema:
+            example: 30
+            type: number
+        - name: minChildren
+          required: false
+          in: query
+          schema:
+            example: 1
+            type: number
+        - name: minScholarship
+          required: false
+          in: query
+          schema:
+            example: 1000
+            type: number
+      responses:
+        "200":
+          description: ""
+      tags:
+        - Students
+info:
+  title: Institut Administration API
+  description: Auto generated OpenAPI spec
+  version: "1.0"
+  contact: {}
+tags: []
+servers: []
+components:
+  schemas:
+    CreateUserDto:
+      type: object
+      properties:
+        email:
+          type: object
+        password:
+          type: object
+      required:
+        - email
+        - password
