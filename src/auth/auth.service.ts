@@ -69,7 +69,7 @@ export class AuthService {
 
     const refreshToken = this.jwtService.sign(payload, {
       secret: process.env.AUTH_SECRET_KEY_REFRESH_TOKEN,
-      expiresIn: '3d',
+      expiresIn: '1d',
     });
 
     return { accessToken, refreshToken };
