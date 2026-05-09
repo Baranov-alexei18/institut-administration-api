@@ -157,8 +157,579 @@ paths:
       responses:
         "200":
           description: ""
-      tags:
+      tags: &a3
         - Students
+    post:
+      operationId: StudentsController_create
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateStudentDto"
+      responses:
+        "201":
+          description: ""
+      tags: *a3
+  /api/v1/students/by-assessment:
+    get:
+      operationId: StudentsController_getByAssessment
+      parameters:
+        - name: groupId
+          required: false
+          in: query
+          schema:
+            example: 1
+            type: number
+        - name: disciplineId
+          required: false
+          in: query
+          schema:
+            example: 1
+            type: number
+        - name: type
+          required: false
+          in: query
+          schema:
+            example: exam
+            type: string
+        - name: grade
+          required: false
+          in: query
+          schema:
+            example: 5
+            type: number
+      responses:
+        "200":
+          description: ""
+      tags: *a3
+  /api/v1/students/session:
+    get:
+      operationId: StudentsController_getSessionStudents
+      parameters:
+        - name: semester
+          required: false
+          in: query
+          schema:
+            example: 1
+            type: number
+        - name: year
+          required: false
+          in: query
+          schema:
+            example: 2024
+            type: number
+        - name: groupId
+          required: false
+          in: query
+          schema:
+            example: 1
+            type: number
+        - name: course
+          required: false
+          in: query
+          schema:
+            example: 1
+            type: number
+        - name: facultyId
+          required: false
+          in: query
+          schema:
+            example: 3
+            type: number
+        - name: type
+          required: true
+          in: query
+          schema:
+            example: excellent
+            type: string
+            enum:
+              - excellent
+              - no_threes
+              - no_twos
+      responses:
+        "200":
+          description: ""
+      tags: *a3
+  /api/v1/students/by-teacher:
+    get:
+      operationId: StudentsController_getStudentsByTeacher
+      parameters:
+        - name: groupIds
+          required: false
+          in: query
+          schema:
+            type: array
+            items:
+              type: string
+        - name: teacherId
+          required: false
+          in: query
+          schema:
+            example: 51
+            type: number
+        - name: disciplineIds
+          required: false
+          in: query
+          schema:
+            type: array
+            items:
+              type: string
+        - name: semesters
+          required: false
+          in: query
+          schema:
+            type: array
+            items:
+              type: string
+        - name: fromYear
+          required: false
+          in: query
+          schema:
+            example: 2023
+            type: number
+        - name: toYear
+          required: false
+          in: query
+          schema:
+            example: 2025
+            type: number
+        - name: grade
+          required: false
+          in: query
+          schema:
+            example: 5
+            type: number
+      responses:
+        "200":
+          description: ""
+      tags: *a3
+  /api/v1/students/theses:
+    get:
+      operationId: StudentsController_getTheses
+      parameters:
+        - name: departmentId
+          required: false
+          in: query
+          schema:
+            example: 1
+            type: number
+        - name: teacherId
+          required: false
+          in: query
+          schema:
+            example: 51
+            type: number
+      responses:
+        "200":
+          description: ""
+      tags: *a3
+  /api/v1/teachers:
+    get:
+      operationId: TeachersController_getTeachers
+      parameters:
+        - name: faculty
+          required: false
+          in: query
+          schema:
+            example: Engineering
+            type: string
+        - name: departmentIds
+          required: false
+          in: query
+          schema:
+            example:
+              - 1
+              - 2
+            type: array
+            items:
+              type: number
+        - name: categories
+          required: false
+          in: query
+          schema:
+            type: array
+            items:
+              type: string
+        - name: gender
+          required: false
+          in: query
+          schema:
+            example: male
+            type: string
+        - name: minAge
+          required: false
+          in: query
+          schema:
+            example: 18
+            type: number
+        - name: maxAge
+          required: false
+          in: query
+          schema:
+            example: 65
+            type: number
+        - name: minChildren
+          required: false
+          in: query
+          schema:
+            example: 0
+            type: number
+        - name: minSalary
+          required: false
+          in: query
+          schema:
+            example: 2000
+            type: number
+        - name: isPhd
+          required: false
+          in: query
+          schema:
+            example: true
+            type: boolean
+        - name: isDoctor
+          required: false
+          in: query
+          schema:
+            example: true
+            type: boolean
+        - name: defenseFrom
+          required: false
+          in: query
+          schema:
+            example: 2010-01-01
+            type: string
+        - name: defenseTo
+          required: false
+          in: query
+          schema:
+            example: 2024-01-01
+            type: string
+      responses:
+        "200":
+          description: ""
+      tags: &a4
+        - Teachers
+    post:
+      operationId: TeachersController_create
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateTeacherDto"
+      responses:
+        "201":
+          description: ""
+      tags: *a4
+  /api/v1/teachers/by-discipline:
+    get:
+      operationId: TeachersController_getByDiscipline
+      parameters:
+        - name: disciplineId
+          required: false
+          in: query
+          schema:
+            example: 1
+            type: number
+        - name: groupId
+          required: false
+          in: query
+          schema:
+            example: 1
+            type: number
+        - name: course
+          required: false
+          in: query
+          schema:
+            example: 2
+            type: number
+        - name: facultyId
+          required: false
+          in: query
+          schema:
+            example: 1
+            type: number
+      responses:
+        "200":
+          description: ""
+      tags: *a4
+  /api/v1/teachers/by-lessons:
+    get:
+      operationId: TeachersController_getByLessons
+      parameters:
+        - name: groupId
+          required: false
+          in: query
+          schema:
+            example: 1
+            type: number
+        - name: course
+          required: false
+          in: query
+          schema:
+            example: 2
+            type: number
+        - name: facultyId
+          required: false
+          in: query
+          schema:
+            example: 1
+            type: number
+        - name: lessonTypes
+          required: false
+          in: query
+          schema:
+            type: array
+            items:
+              type: string
+        - name: semester
+          required: false
+          in: query
+          schema:
+            example: 1
+            type: number
+        - name: fromYear
+          required: false
+          in: query
+          schema:
+            example: 2023
+            type: number
+        - name: toYear
+          required: false
+          in: query
+          schema:
+            example: 2025
+            type: number
+      responses:
+        "200":
+          description: ""
+      tags: *a4
+  /api/v1/teachers/examiners:
+    get:
+      operationId: TeachersController_getExaminers
+      parameters:
+        - name: groupIds
+          required: false
+          in: query
+          schema:
+            example:
+              - 1
+            type: array
+            items:
+              type: number
+        - name: disciplineIds
+          required: false
+          in: query
+          schema:
+            example:
+              - 1
+            type: array
+            items:
+              type: number
+        - name: semester
+          required: false
+          in: query
+          schema:
+            example: 1
+            type: number
+        - name: year
+          required: false
+          in: query
+          schema:
+            example: 2024
+            type: number
+      responses:
+        "200":
+          description: ""
+      tags: *a4
+  /api/v1/teachers/thesis-supervisors:
+    get:
+      operationId: TeachersController_getThesisSupervisors
+      parameters:
+        - name: departmentId
+          required: false
+          in: query
+          schema:
+            example: 1
+            type: number
+        - name: facultyId
+          required: false
+          in: query
+          schema:
+            example: 1
+            type: number
+        - name: categoryIds
+          required: false
+          in: query
+          schema:
+            example:
+              - 1
+              - 2
+            type: array
+            items:
+              type: number
+      responses:
+        "200":
+          description: ""
+      tags: *a4
+  /api/v1/teachers/workload:
+    get:
+      operationId: TeachersController_getWorkload
+      parameters:
+        - name: semester
+          required: true
+          in: query
+          schema:
+            type: number
+        - name: teacherId
+          required: false
+          in: query
+          schema:
+            type: number
+        - name: departmentId
+          required: false
+          in: query
+          schema:
+            type: number
+      responses:
+        "200":
+          description: ""
+      tags: *a4
+  /api/v1/dissertations:
+    get:
+      operationId: DissertationsController_getAll
+      parameters:
+        - name: departmentIds
+          required: false
+          in: query
+          schema:
+            example:
+              - 1
+              - 2
+            type: array
+            items:
+              type: number
+        - name: facultyIds
+          required: false
+          in: query
+          schema:
+            example:
+              - 1
+              - 2
+            type: array
+            items:
+              type: number
+        - name: type
+          required: false
+          in: query
+          schema:
+            example: phd
+            type: string
+        - name: from
+          required: false
+          in: query
+          schema:
+            example: 2000-01-01
+            type: string
+        - name: to
+          required: false
+          in: query
+          schema:
+            example: 2025-01-01
+            type: string
+      responses:
+        "200":
+          description: ""
+      tags: &a5
+        - Dissertations
+  /api/v1/dissertations/count:
+    get:
+      operationId: DissertationsController_getCount
+      parameters:
+        - name: departmentIds
+          required: false
+          in: query
+          schema:
+            example:
+              - 1
+              - 2
+            type: array
+            items:
+              type: number
+        - name: facultyIds
+          required: false
+          in: query
+          schema:
+            example:
+              - 1
+              - 2
+            type: array
+            items:
+              type: number
+        - name: type
+          required: false
+          in: query
+          schema:
+            example: phd
+            type: string
+        - name: from
+          required: false
+          in: query
+          schema:
+            example: 2000-01-01
+            type: string
+        - name: to
+          required: false
+          in: query
+          schema:
+            example: 2025-01-01
+            type: string
+      responses:
+        "200":
+          description: ""
+      tags: *a5
+  /api/v1/departments/teaching:
+    get:
+      operationId: DepartmentsController_getTeachingDepartments
+      parameters:
+        - name: groupId
+          required: false
+          in: query
+          schema:
+            example: 1
+            type: number
+        - name: facultyId
+          required: false
+          in: query
+          schema:
+            example: 1
+            type: number
+        - name: semester
+          required: false
+          in: query
+          schema:
+            example: 1
+            type: number
+        - name: fromYear
+          required: false
+          in: query
+          schema:
+            example: 2023
+            type: number
+        - name: toYear
+          required: false
+          in: query
+          schema:
+            example: 2025
+            type: number
+      responses:
+        "200":
+          description: ""
+      tags:
+        - Departments
 info:
   title: Institut Administration API
   description: Auto generated OpenAPI spec
@@ -178,3 +749,70 @@ components:
       required:
         - email
         - password
+    CreateStudentDto:
+      type: object
+      properties:
+        firstName:
+          type: string
+        lastName:
+          type: string
+        gender:
+          type: string
+          example: male
+        birthDate:
+          type: string
+        childrenCount:
+          type: number
+        groupId:
+          type: number
+        scholarshipAmount:
+          type: number
+    DissertationDto:
+      type: object
+      properties:
+        type:
+          type: string
+          example: candidate
+        topic:
+          type: string
+        defenseDate:
+          type: string
+      required:
+        - type
+        - topic
+        - defenseDate
+    CreateTeacherDto:
+      type: object
+      properties:
+        firstName:
+          type: string
+        lastName:
+          type: string
+        gender:
+          type: string
+        birthDate:
+          type: string
+        childrenCount:
+          type: number
+        departmentId:
+          type: number
+        categoryId:
+          type: number
+        salary:
+          type: number
+        isPostgraduateStudent:
+          type: boolean
+        dissertations:
+          type: array
+          items:
+            $ref: "#/components/schemas/DissertationDto"
+      required:
+        - firstName
+        - lastName
+        - gender
+        - birthDate
+        - childrenCount
+        - departmentId
+        - categoryId
+        - salary
+        - isPostgraduateStudent
