@@ -5,6 +5,7 @@ import { GetStudentsByAssessmentDto } from './dto/get-students-by-assessment.dto
 import { GetSessionStudentsDto } from './dto/get-session-students.dto';
 import { GetStudentsByTeacherDto } from '../teachers/dto/get-students-by-teacher.dto';
 import { GetThesesDto } from './dto/get-theses.dto';
+import { CreateStudentDto } from './dto/create-student.dto';
 
 @Injectable()
 export class StudentsService {
@@ -306,5 +307,54 @@ export class StudentsService {
     const result = await this.db.query(query, params);
 
     return result.rows;
+  }
+
+  async create(dto: CreateStudentDto) {
+    const client = await this.db.getClient();
+
+    try {
+      await client.query('BEGIN');
+
+      // 🔥 persons
+      const personResult = await client.query(
+        `
+      INSERT INTO persons (
+        first_name,
+        last_name,
+        gender,
+        birth_date,
+        children_count
+      )
+      VALUES ($1, $2, $3, $4, $5)
+      RETURNING id
+      `,
+        [dto.firstName, dto.lastName, dto.gender, dto.birthDate, dto.childrenCount],
+      );
+
+      const personId = personResult.rows[0].id;
+
+      // 🔥 students
+      const studentResult = await client.query(
+        `
+      INSERT INTO students (
+        id,
+        group_id,
+        scholarship_amount
+      )
+      VALUES ($1, $2, $3)
+      RETURNING *
+      `,
+        [personId, dto.groupId, dto.scholarshipAmount],
+      );
+
+      await client.query('COMMIT');
+
+      return studentResult.rows[0];
+    } catch (e) {
+      await client.query('ROLLBACK');
+      throw e;
+    } finally {
+      client.release();
+    }
   }
 }

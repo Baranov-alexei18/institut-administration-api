@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { DatabaseService } from '../database/database.service';
 import { GetTeachersDto } from './dto/get-teachers.dto';
 import { GetTeachersByDisciplineDto } from './dto/get-teachers-by-discipline.dto';
@@ -6,6 +6,7 @@ import { GetTeachersByLessonsDto } from './dto/get-teachers-by-lessons.dto';
 import { GetExaminersDto } from './dto/get-examiners.dto';
 import { GetThesisSupervisorsDto } from './dto/get-thesis-supervisors.dto';
 import { GetWorkloadDto } from './dto/get-workload.dto';
+import { CreateTeacherDto } from './dto/create-teacher.dto';
 
 @Injectable()
 export class TeachersService {
@@ -422,5 +423,74 @@ export class TeachersService {
     const result = await this.db.query(query, params);
 
     return result.rows;
+  }
+
+  async create(dto: CreateTeacherDto) {
+    const client = await this.db.getClient();
+
+    try {
+      await client.query('BEGIN');
+
+      // 🔥 person
+      const personResult = await client.query(
+        `
+      INSERT INTO persons (
+        first_name,
+        last_name,
+        gender,
+        birth_date,
+        children_count
+      )
+      VALUES ($1, $2, $3, $4, $5)
+      RETURNING id
+      `,
+        [dto.firstName, dto.lastName, dto.gender, dto.birthDate, dto.childrenCount],
+      );
+
+      const personId = personResult.rows[0].id;
+
+      // 🔥 teacher
+      const teacherResult = await client.query(
+        `
+      INSERT INTO teachers (
+        id,
+        department_id,
+        category_id,
+        salary,
+        is_postgraduate
+      )
+      VALUES ($1, $2, $3, $4, $5)
+      RETURNING *
+      `,
+        [personId, dto.departmentId, dto.categoryId, dto.salary, dto.isPostgraduateStudent],
+      );
+
+      // 🔥 dissertations
+      if (dto.dissertations?.length) {
+        for (const dissertation of dto.dissertations) {
+          await client.query(
+            `
+          INSERT INTO dissertations (
+            teacher_id,
+            topic,
+            type,
+            defense_date
+          )
+          VALUES ($1, $2, $3, $4)
+          `,
+            [personId, dissertation.topic, dissertation.type, dissertation.defenseDate],
+          );
+        }
+      }
+
+      await client.query('COMMIT');
+
+      return teacherResult.rows[0];
+    } catch (e) {
+      await client.query('ROLLBACK');
+      throw e;
+    } finally {
+      client.release();
+    }
   }
 }

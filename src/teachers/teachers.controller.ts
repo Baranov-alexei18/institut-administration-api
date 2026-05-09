@@ -1,4 +1,4 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { TeachersService } from './teachers.service';
 import { GetTeachersDto } from './dto/get-teachers.dto';
@@ -7,6 +7,7 @@ import { GetTeachersByLessonsDto } from './dto/get-teachers-by-lessons.dto';
 import { GetExaminersDto } from './dto/get-examiners.dto';
 import { GetThesisSupervisorsDto } from './dto/get-thesis-supervisors.dto';
 import { GetWorkloadDto } from './dto/get-workload.dto';
+import { CreateTeacherDto } from './dto/create-teacher.dto';
 
 @ApiTags('Teachers')
 @Controller('teachers')
@@ -41,5 +42,10 @@ export class TeachersController {
   @Get('workload')
   getWorkload(@Query() query: GetWorkloadDto) {
     return this.service.getWorkload(query);
+  }
+
+  @Post()
+  create(@Body() dto: CreateTeacherDto) {
+    return this.service.create(dto);
   }
 }
