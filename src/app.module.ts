@@ -14,6 +14,9 @@ import { DissertationsController } from './dissertations/dissertations.controlle
 import { DissertationsService } from './dissertations/dissertations.service';
 import { DissertationsModule } from './dissertations/dissertations.module';
 import { DepartmentsModule } from './departments/departments.module';
+import { DictionaryController } from './dictionary/dictionary.controller';
+import { DictionaryService } from './dictionary/dictionary.service';
+import { DictionaryModule } from './dictionary/dictionary.module';
 
 @Module({
   imports: [
@@ -28,6 +31,7 @@ import { DepartmentsModule } from './departments/departments.module';
     TeachersModule,
     DissertationsModule,
     DepartmentsModule,
+    DictionaryModule,
   ],
   controllers: [AppController],
   providers: [AppService],

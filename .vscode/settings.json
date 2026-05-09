@@ -5,5 +5,8 @@
 
   "prettier.resolveGlobalModules": false,
 
-  "prettier.useEditorConfig": false
+  "prettier.useEditorConfig": false,
+
+  "typescript.preferences.importModuleSpecifier": "relative",
+  "javascript.preferences.importModuleSpecifier": "relative"
 }

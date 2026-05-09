@@ -730,6 +730,55 @@ paths:
           description: ""
       tags:
         - Departments
+  /api/v1/dictionary/groups:
+    get:
+      operationId: DictionaryController_getGroups
+      parameters: []
+      responses:
+        "200":
+          description: ""
+      tags: &a6
+        - Dictionary
+  /api/v1/dictionary/departments:
+    get:
+      operationId: DictionaryController_getDepartments
+      parameters: []
+      responses:
+        "200":
+          description: ""
+      tags: *a6
+  /api/v1/dictionary/disciplines:
+    get:
+      operationId: DictionaryController_getDisciplines
+      parameters: []
+      responses:
+        "200":
+          description: ""
+      tags: *a6
+  /api/v1/dictionary/faculties:
+    get:
+      operationId: DictionaryController_getFaculties
+      parameters: []
+      responses:
+        "200":
+          description: ""
+      tags: *a6
+  /api/v1/dictionary/lesson-types:
+    get:
+      operationId: DictionaryController_getLessonTypes
+      parameters: []
+      responses:
+        "200":
+          description: ""
+      tags: *a6
+  /api/v1/dictionary/teacher-categories:
+    get:
+      operationId: DictionaryController_getTeacherCategories
+      parameters: []
+      responses:
+        "200":
+          description: ""
+      tags: *a6
 info:
   title: Institut Administration API
   description: Auto generated OpenAPI spec
