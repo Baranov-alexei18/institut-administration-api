@@ -18,10 +18,15 @@ export class GetTeachersByLessonsDto {
   @Type(() => Number)
   facultyId?: number;
 
-  @ApiPropertyOptional({ example: 'lecture' })
+  @ApiPropertyOptional({
+    example: [1, 2],
+    type: [Number],
+  })
   @IsOptional()
-  @Transform(({ value }) => (Array.isArray(value) ? value : value ? [value] : undefined))
-  lessonTypes?: string[]; // ['lecture', 'seminar']
+  @Transform(({ value }) =>
+    Array.isArray(value) ? value.map(Number) : value ? [Number(value)] : undefined,
+  )
+  lessonTypeIds?: number[];
 
   @ApiPropertyOptional({ example: 1 })
   @IsOptional()

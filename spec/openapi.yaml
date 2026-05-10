@@ -478,13 +478,16 @@ paths:
           schema:
             example: 1
             type: number
-        - name: lessonTypes
+        - name: lessonTypeIds
           required: false
           in: query
           schema:
+            example:
+              - 1
+              - 2
             type: array
             items:
-              type: string
+              type: number
         - name: semester
           required: false
           in: query
