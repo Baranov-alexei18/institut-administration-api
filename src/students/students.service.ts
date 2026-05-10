@@ -144,50 +144,91 @@ export class StudentsService {
       p.first_name,
       p.last_name,
       g.name AS group_name,
+      g.course,
+      a.semester,
+      f.name AS faculty_name,
       COUNT(*) OVER() AS total_count
+
     FROM assessments a
     JOIN students s ON s.id = a.student_id
     JOIN persons p ON p.id = s.id
     JOIN groups g ON g.id = s.group_id
     JOIN faculties f ON f.id = g.faculty_id
-    WHERE a.semester = $1 AND a.year = $2
+
+    WHERE 1=1
   `;
 
-    const params: any[] = [filters.semester, filters.year];
-    let i = 3;
+    const params: any[] = [];
+    let idx = 1;
 
-    // 🔥 группа ИЛИ курс+факультет
+    // semester
+    if (filters.semester) {
+      query += ` AND a.semester = $${idx++}`;
+      params.push(filters.semester);
+    }
+
+    // year
+    if (filters.year) {
+      query += ` AND a.year = $${idx++}`;
+      params.push(filters.year);
+    }
+
+    // group
     if (filters.groupId) {
-      query += ` AND g.id = $${i++}`;
+      query += ` AND g.id = $${idx++}`;
       params.push(filters.groupId);
-    } else if (filters.course && filters.facultyId) {
-      query += ` AND g.course = $${i++} AND f.id = $${i++}`;
-      params.push(filters.course, filters.facultyId);
+    }
+
+    // course
+    if (filters.course) {
+      query += ` AND g.course = $${idx++}`;
+      params.push(filters.course);
+    }
+
+    // faculty
+    if (filters.facultyId) {
+      query += ` AND f.id = $${idx++}`;
+      params.push(filters.facultyId);
     }
 
     query += `
-    GROUP BY s.id, p.first_name, p.last_name, g.name
+    GROUP BY
+      s.id,
+      p.first_name,
+      p.last_name,
+      a.semester,
+      g.name,
+      g.course,
+      f.name
   `;
 
-    // 🔥 условия
+    // excellent only
     if (filters.type === 'excellent') {
       query += ` HAVING MIN(a.grade) = 5`;
     }
 
+    // without threes
     if (filters.type === 'no_threes') {
       query += ` HAVING MIN(a.grade) >= 4`;
     }
 
+    // without twos
     if (filters.type === 'no_twos') {
       query += ` HAVING MIN(a.grade) >= 3`;
     }
+
+    query += `
+    ORDER BY
+      p.last_name,
+      p.first_name
+  `;
 
     const result = await this.db.query(query, params);
 
     return result.rows;
   }
 
-  // Заданние 10
+  // Задание 10
   async getStudentsByTeacher(filters: GetStudentsByTeacherDto) {
     let query = `
     SELECT DISTINCT
@@ -274,35 +315,49 @@ export class StudentsService {
       s.id,
       p.first_name,
       p.last_name,
+
       t.topic AS thesis_title,
+
+      d.name AS department_name,
+
+      tp.first_name AS teacher_first_name,
+      tp.last_name AS teacher_last_name,
+
       COUNT(*) OVER() AS total_count
+
     FROM theses t
+
     JOIN students s ON s.id = t.student_id
     JOIN persons p ON p.id = s.id
+
+    LEFT JOIN departments d ON d.id = t.department_id
+
+    LEFT JOIN teachers tr ON tr.id = t.teacher_id
+    LEFT JOIN persons tp ON tp.id = tr.id
+
     WHERE 1=1
   `;
 
     const params: any[] = [];
     let i = 1;
 
-    // 🔥 кафедра ИЛИ преподаватель
-    if (filters.departmentId || filters.teacherId) {
-      query += ` AND (`;
-
-      if (filters.departmentId) {
-        query += ` t.department_id = $${i++}`;
-        params.push(filters.departmentId);
-      }
-
-      if (filters.teacherId) {
-        if (filters.departmentId) query += ` OR`;
-
-        query += ` t.teacher_id = $${i++}`;
-        params.push(filters.teacherId);
-      }
-
-      query += `)`;
+    // department
+    if (filters.departmentId) {
+      query += ` AND t.department_id = $${i++}`;
+      params.push(filters.departmentId);
     }
+
+    // teacher
+    if (filters.teacherId) {
+      query += ` AND t.teacher_id = $${i++}`;
+      params.push(filters.teacherId);
+    }
+
+    query += `
+    ORDER BY
+      p.last_name,
+      p.first_name
+  `;
 
     const result = await this.db.query(query, params);
 

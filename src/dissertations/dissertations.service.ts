@@ -9,24 +9,25 @@ export class DissertationsService {
   // Задание 3
   async getDissertations(filters: GetDissertationsDto) {
     let query = `
-    SELECT 
-      dis.id,
-      dis.type,
-      dis.defense_date,
-
-      p.first_name,
-      p.last_name,
-
-      d.name AS department_name,
-      f.name AS faculty_name
-
-    FROM dissertations dis
-    JOIN teachers t ON t.id = dis.teacher_id
-    JOIN persons p ON p.id = t.id
-    JOIN departments d ON d.id = t.department_id
-    JOIN faculties f ON f.id = d.faculty_id
-
-    WHERE 1=1
+      SELECT 
+        dis.id,
+        dis.topic,
+        dis.type,
+        dis.defense_date,
+      
+        p.first_name,
+        p.last_name,
+      
+        d.name AS department_name,
+        f.name AS faculty_name
+      
+      FROM dissertations dis
+      JOIN teachers t ON t.id = dis.teacher_id
+      JOIN persons p ON p.id = t.id
+      JOIN departments d ON d.id = t.department_id
+      JOIN faculties f ON f.id = d.faculty_id
+      
+      WHERE 1=1
   `;
 
     const params: any[] = [];

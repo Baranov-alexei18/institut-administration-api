@@ -209,12 +209,13 @@ export class TeachersService {
     let i = 1;
 
     // 🔥 фильтр по типам занятий
-    if (filters.lessonTypes?.length) {
-      const lessonTypeNames = Array.isArray(filters.lessonTypes)
-        ? filters.lessonTypes
-        : [filters.lessonTypes];
-      query += ` AND lt.name = ANY($${i++})`;
-      params.push(lessonTypeNames);
+    if (filters.lessonTypeIds?.length) {
+      const lessonTypeIds = Array.isArray(filters.lessonTypeIds)
+        ? filters.lessonTypeIds
+        : [filters.lessonTypeIds];
+
+      query += ` AND ta.lesson_type_id = ANY($${i++})`;
+      params.push(lessonTypeIds);
     }
 
     // 🔥 группа
@@ -264,12 +265,25 @@ export class TeachersService {
       t.id,
       p.first_name,
       p.last_name,
+
+      g.name AS group_name,
+      d.name AS discipline_name,
+
+      a.semester,
+      a.year,
+
       COUNT(*) OVER() AS total_count
+
     FROM assessments a
+
     JOIN teachers t ON t.id = a.teacher_id
     JOIN persons p ON p.id = t.id
+
     JOIN students s ON s.id = a.student_id
     JOIN groups g ON g.id = s.group_id
+
+    JOIN disciplines d ON d.id = a.discipline_id
+
     WHERE a.assessment_type = 'exam'
   `;
 
