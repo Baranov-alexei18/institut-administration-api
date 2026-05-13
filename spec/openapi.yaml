@@ -325,6 +325,37 @@ paths:
         "200":
           description: ""
       tags: *a3
+  /api/v1/students/{id}:
+    patch:
+      operationId: StudentsController_update
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateStudentDto"
+      responses:
+        "200":
+          description: ""
+      tags: *a3
+    delete:
+      operationId: StudentsController_remove
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: number
+      responses:
+        "200":
+          description: ""
+      tags: *a3
   /api/v1/teachers:
     get:
       operationId: TeachersController_getTeachers
@@ -595,6 +626,37 @@ paths:
         - name: departmentId
           required: false
           in: query
+          schema:
+            type: number
+      responses:
+        "200":
+          description: ""
+      tags: *a4
+  /api/v1/teachers/{id}:
+    patch:
+      operationId: TeachersController_update
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateTeacherDto"
+      responses:
+        "200":
+          description: ""
+      tags: *a4
+    delete:
+      operationId: TeachersController_remove
+      parameters:
+        - name: id
+          required: true
+          in: path
           schema:
             type: number
       responses:
