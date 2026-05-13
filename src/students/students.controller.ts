@@ -1,4 +1,14 @@
-import { Body, Controller, Get, Post, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  ParseIntPipe,
+  Patch,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { StudentsService } from './students.service';
 import { GetStudentsDto } from './dto/get-students.dto';
 import { GetStudentsByAssessmentDto } from './dto/get-students-by-assessment.dto';
@@ -39,5 +49,15 @@ export class StudentsController {
   @Post()
   create(@Body() dto: CreateStudentDto) {
     return this.studentsService.create(dto);
+  }
+
+  @Patch(':id')
+  update(@Param('id', ParseIntPipe) id: number, @Body() dto: CreateStudentDto) {
+    return this.studentsService.update(id, dto);
+  }
+
+  @Delete(':id')
+  remove(@Param('id', ParseIntPipe) id: number) {
+    return this.studentsService.remove(id);
   }
 }

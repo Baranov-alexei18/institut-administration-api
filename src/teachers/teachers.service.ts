@@ -25,8 +25,8 @@ export class TeachersService {
 
         d.name AS department_name,
         f.name AS faculty_name,
+        tc.id AS category_id,
         tc.name AS category,
-
         t.salary,
 
         COUNT(DISTINCT dis.id) FILTER (WHERE dis.type = 'phd') AS phd_count,
@@ -69,7 +69,7 @@ export class TeachersService {
         ? filters.categories
         : [filters.categories];
 
-      query += ` AND d.id = ANY($${i++})`;
+      query += ` AND tc.id = ANY($${i++})`;
       params.push(categoriesIds);
     }
 
@@ -110,7 +110,7 @@ export class TeachersService {
 
     query += `
       GROUP BY 
-        p.id, d.name, f.name, tc.name, t.salary
+        p.id, d.name, f.name, tc.name, t.salary, tc.id
     `;
 
     // 🔥 фильтр по наличию степеней (после GROUP BY)
@@ -500,6 +500,128 @@ export class TeachersService {
       await client.query('COMMIT');
 
       return teacherResult.rows[0];
+    } catch (e) {
+      await client.query('ROLLBACK');
+      throw e;
+    } finally {
+      client.release();
+    }
+  }
+
+  async update(id: number, dto: CreateTeacherDto) {
+    const client = await this.db.getClient();
+
+    try {
+      await client.query('BEGIN');
+
+      // 🔥 update persons
+      await client.query(
+        `
+      UPDATE persons
+      SET
+        first_name = $1,
+        last_name = $2,
+        gender = $3,
+        birth_date = $4,
+        children_count = $5
+      WHERE id = $6
+      `,
+        [dto.firstName, dto.lastName, dto.gender, dto.birthDate, dto.childrenCount, id],
+      );
+
+      // 🔥 update teachers
+      const teacherResult = await client.query(
+        `
+      UPDATE teachers
+      SET
+        department_id = $1,
+        category_id = $2,
+        salary = $3,
+        is_postgraduate = $4
+      WHERE id = $5
+      RETURNING *
+      `,
+        [dto.departmentId, dto.categoryId, dto.salary, dto.isPostgraduateStudent, id],
+      );
+
+      // 🔥 dissertations
+      // проще всего:
+      // удалить старые и создать новые
+
+      await client.query(
+        `
+      DELETE FROM dissertations
+      WHERE teacher_id = $1
+      `,
+        [id],
+      );
+
+      if (dto.dissertations?.length) {
+        for (const dissertation of dto.dissertations) {
+          await client.query(
+            `
+          INSERT INTO dissertations (
+            teacher_id,
+            topic,
+            type,
+            defense_date
+          )
+          VALUES ($1, $2, $3, $4)
+          `,
+            [id, dissertation.topic, dissertation.type, dissertation.defenseDate],
+          );
+        }
+      }
+
+      await client.query('COMMIT');
+
+      return teacherResult.rows[0];
+    } catch (e) {
+      await client.query('ROLLBACK');
+      throw e;
+    } finally {
+      client.release();
+    }
+  }
+
+  async remove(id: number) {
+    const client = await this.db.getClient();
+
+    try {
+      await client.query('BEGIN');
+
+      // 🔥 dissertations
+      await client.query(
+        `
+      DELETE FROM dissertations
+      WHERE teacher_id = $1
+      `,
+        [id],
+      );
+
+      // 🔥 teachers
+      await client.query(
+        `
+      DELETE FROM teachers
+      WHERE id = $1
+      `,
+        [id],
+      );
+
+      // 🔥 persons
+      await client.query(
+        `
+      DELETE FROM persons
+      WHERE id = $1
+      `,
+        [id],
+      );
+
+      await client.query('COMMIT');
+
+      return {
+        message: 'Teacher deleted successfully',
+      };
     } catch (e) {
       await client.query('ROLLBACK');
       throw e;

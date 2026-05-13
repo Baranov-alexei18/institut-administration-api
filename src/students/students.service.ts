@@ -412,4 +412,86 @@ export class StudentsService {
       client.release();
     }
   }
+
+  async update(id: number, dto: CreateStudentDto) {
+    const client = await this.db.getClient();
+
+    try {
+      await client.query('BEGIN');
+
+      // 🔥 update persons
+      await client.query(
+        `
+      UPDATE persons
+      SET
+        first_name = $1,
+        last_name = $2,
+        gender = $3,
+        birth_date = $4,
+        children_count = $5
+      WHERE id = $6
+      `,
+        [dto.firstName, dto.lastName, dto.gender, dto.birthDate, dto.childrenCount, id],
+      );
+
+      // 🔥 update students
+      const result = await client.query(
+        `
+      UPDATE students
+      SET
+        group_id = $1,
+        scholarship_amount = $2
+      WHERE id = $3
+      RETURNING *
+      `,
+        [dto.groupId, dto.scholarshipAmount, id],
+      );
+
+      await client.query('COMMIT');
+
+      return result.rows[0];
+    } catch (e) {
+      await client.query('ROLLBACK');
+      throw e;
+    } finally {
+      client.release();
+    }
+  }
+
+  async remove(id: number) {
+    const client = await this.db.getClient();
+
+    try {
+      await client.query('BEGIN');
+
+      // 🔥 сначала students
+      await client.query(
+        `
+      DELETE FROM students
+      WHERE id = $1
+      `,
+        [id],
+      );
+
+      // 🔥 потом persons
+      await client.query(
+        `
+      DELETE FROM persons
+      WHERE id = $1
+      `,
+        [id],
+      );
+
+      await client.query('COMMIT');
+
+      return {
+        message: 'Student deleted successfully',
+      };
+    } catch (e) {
+      await client.query('ROLLBACK');
+      throw e;
+    } finally {
+      client.release();
+    }
+  }
 }

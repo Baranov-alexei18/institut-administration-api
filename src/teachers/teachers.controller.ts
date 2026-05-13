@@ -1,4 +1,14 @@
-import { Body, Controller, Get, Post, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  ParseIntPipe,
+  Patch,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { TeachersService } from './teachers.service';
 import { GetTeachersDto } from './dto/get-teachers.dto';
@@ -47,5 +57,15 @@ export class TeachersController {
   @Post()
   create(@Body() dto: CreateTeacherDto) {
     return this.service.create(dto);
+  }
+
+  @Patch(':id')
+  update(@Param('id', ParseIntPipe) id: number, @Body() dto: CreateTeacherDto) {
+    return this.service.update(id, dto);
+  }
+
+  @Delete(':id')
+  remove(@Param('id', ParseIntPipe) id: number) {
+    return this.service.remove(id);
   }
 }
